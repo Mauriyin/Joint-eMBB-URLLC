@@ -15,6 +15,7 @@ class NaiveSolver(Scheduler):
         self.solver = solver
 
     def allocate_resource(self):
+        self._user_sort()
         rb_start = get_safe_true_start(self.RB_map.bitmap==0)
         if rb_start is None:
             print("ERROR: There is no free rb available")
