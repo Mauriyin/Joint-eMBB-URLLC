@@ -10,18 +10,16 @@ class Users:
         sche_times: an int indicating the scheduling times for the user.
         active: a boolean indicating the active status of the user.
     """
-    self.user_info = {}
-    self.rb_size = 0
-    self.rb_num_req = 0
-    self.rb_num_ass = 0
-    self.rb_start = 0
-    self.sche_times = 0
-    self.active = 0
 
     def __init__(self, uid, rb_size, rb_num_req):
+        self.user_info = {}
         self.user_info['id'] = uid
         self.rb_size = rb_size
         self.rb_num_req = rb_num_req
+        self.rb_num_ass = 0
+        self.rb_start = 0
+        self.sche_times = 0
+        self.active = 0
 
     def current_status(self):
         if self.active:
@@ -49,15 +47,13 @@ class eMBB_User(Users):
         sche_times: an int indicating the schduled times for the user.
         active: a boolean indicating the active status of the user.
     """
-    self.DRC = 0.0
-    self.rate_slot = 0.0
-    self.rate_avg = 0.0
-    self.slot_len = 0
     
     def __init__(self, uid, rb_size, rb_num_req, slot_len):
         Users.__init__(self, uid, rb_size, rb_num_req)
         self.slot_len = slot_len
         self.DRC = (self.rb_size * self.rb_num_req / 1000) / slot_len
+        self.rate_slot = 0.0
+        self.rate_avg = 0.0
     
     def current_status(self): 
         if self.active:
@@ -86,11 +82,6 @@ class URLLC_User(Users):
         sche_times: an int indicating the schduled times for the user.
         active: a boolean indicating the active status of the user.
     """
-    self.latency = 0.0
-    self.error_rate = 0.0
-    self.slot_len = 0
-    self.slot_start = 0
-    self.retrans = 0
 
     def __init__(self, uid, rb_size, rb_req, slot_len, slot_start, latency, error_rate):
         Users.__init__(self, uid, rb_size, rb_req)
@@ -98,6 +89,7 @@ class URLLC_User(Users):
         self.slot_start = slot_start
         self.latency = latency
         self.errer_rate = error_rate
+        self.retrans = 0
 
     def current_status(self):
         if self.active:
