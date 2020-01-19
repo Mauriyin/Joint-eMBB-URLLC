@@ -18,7 +18,7 @@ class RB:
         self.border_bitmap_id = embb_num
 
     def find_all_nofree_rb(self):
-        """Find all continous region of rb units assigned to emmb user.
+        """Find all continous region of rb units assigned to embb user.
 
         """
 
