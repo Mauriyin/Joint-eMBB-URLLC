@@ -1,55 +1,3 @@
-class Users:
-    id = 0
-    rb_size = 0
-    rb_num_req = 0
-    rb_num_ass = 0
-    rb_start = 0
-    sche_times = 0
-    Active = 0
-
-    def __init__(self, uid, size, req):
-        self.id = uid
-        self.rb_size = size
-        self.rb_num_req = req
-
-    def current_status(self):
-        print("Current status of user %d is:\nRB_size: %d\nRB_num_req: %d\nRB_num_ass: %d\nRB_start is %d\n" %(self.id, self.rb_size, self.rb_num_req, self.rb_num_ass, self.rb_start))
-
-
-class eMBB_User(Users):
-    DRC = 0.0
-    rate_slot = 0.0
-    rate_avg = 0.0
-    slot_len = 0
-    
-
-    def __init__(self,  uid, size, req, slot_len):
-        Users.__init__(self, uid, size, req)
-        self.slot_len = slot_len
-        self.DRC = (self.rb_size * self.rb_num_req / 1000) / slot_len
-    
-    def current_status(self):
-        print("Current RB status of user %d is:\nRB_size: %d\nRB_num_req: %d\nRB_num_ass: %d\nRB_start is %d\n" %(self.id, self.rb_size, self.rb_num_req, self.rb_num_ass, self.rb_start))
-        print("Current Rate status of user %d is:\nDRC: %f\nslot length: %d\nrate in this slot: %f\naverage rate is %f\n" %(self.id, self.DRC, self.slot_len, self.rate_slot, self.rate_avg))
-
-class URLLC_User(Users):
-    latency = 0.0
-    errer_rate = 0.0
-    slot_len = 0
-    slot_start = 0
-    retrans = 0
-
-    def __init__(self,  uid, size, req, slot_len, slot_start, latency, error_rate):
-        Users.__init__(self, uid, size, req)
-        self.slot_len = slot_len
-        self.slot_start = slot_start
-        self.latency = latency
-        self.errer_rate = error_rate
-
-    def current_status(self):
-        print("Current RB status of user %d is:\nRB_size: %d\nRB_num_req: %d\nRB_num_ass: %d\nRB_start is %d\n" %(self.id, self.rb_size, self.rb_num_req, self.rb_num_ass, self.rb_start))
-        print("Current status of URLLC user %d is:\nLatency constraint: %d ms\nmini slot length: %d\nstart in slot: %d\nretransmission times: %d\n" %(self.id, self.latency, self.slot_len, self.slot_start, self.retrans))
-
 class Scheduler():
     rb_avi = 0
     user_num = 0
@@ -112,6 +60,3 @@ class PfScheduler(Scheduler):
                 self.user_que[i].sche_times += 1
                 self.user_que[i].rb_start = rb_start
                 break
-
-
-                
