@@ -3,6 +3,7 @@ import random
 from libs.user import eMBB_User
 from libs.user import URLLC_User
 from libs.rb import RB
+from utils.utils import get_retrans_schedule
 
 def generate(
              rb_size,
@@ -11,8 +12,9 @@ def generate(
              embb_slot_len, 
              urllc_num,
              urllc_slot_len,
-             latency,
-             error_rate,
+             latency=1,
+             error_rate=1e-5,
+             mcs_error=1e-3,
              ):
     """Generate the simulation input of eMBB Users and URLLC Users, 
        as well as initializing RB status.
@@ -30,9 +32,9 @@ def generate(
         urllc_num: an int indicating the total number of coming URLLC Users.
         urllc_slot_len: an int indicating the scheduler time slot length for an URLLC User, 
             the functioning frequency of URLLC User scheduler. #TODO is this right?
-        latency: a float indicating the lantency maximum constriant of the URLLC User.
+        latency: an int indicating the lantency maximum constriant of the URLLC User.
         error_rate: a float indicating the maximum error rate constriant of the URLLC User.
-        
+        mcs_error: a float indicating error rate for each transmission. 
     Return:
         RB_map: a RB instance indicating the status of rb units.
         embb_users: a list of eMBB_User instances indicating the information of coming eMBB Users 
@@ -64,9 +66,15 @@ def generate(
     for i in range(urllc_num):
         rb_num_req = random.randint(0, urllc_upper)
         slot_start = random.randint(1, slot_len)
-        urllc_user = URLLC_User(id_current+i, rb_size, rb_num_req, urllc_slot_len,
-            slot_start, latency, error_rate)
-        urllc_users.append(urllc_user)
+        retrans, trans_start = get_retrans_schedule(latency, error_rate, mcs_error)
+        assert retrans == len(trans_start)
+        trans_start.insert(0, 0)
+        for j in range(retrans+1):
+            t = trans_start[j]
+            urllc_user = URLLC_User(id_current+i+j, rb_size, rb_num_req, urllc_slot_len,
+                slot_start+t, retrans, latency, error_rate, mcs_error)
+            urllc_users.append(urllc_user)
+        id_current = id_current + retrans
 
     RB_map = RB(rb_num, rb_size, embb_num)
 

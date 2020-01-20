@@ -68,8 +68,10 @@ class URLLC_User(Users):
     """Class for URLLC users.
     
     Attributes:
-        latency: a float indicating the lantency maximum constriant of the URLLC User.
+        latency: an int indicating the lantency maximum constriant of the URLLC User.
+        delay: an int indicating the actual delay time of the URLLC User.
         error_rate: a float indicating the maximum error rate constriant of the URLLC User.
+        mcs_error: a float indicating error rate for each transmission. 
         slot_len: an int indicating the scheduler time slot length for an URLLC User, 
                   the functioning frequency of URLLC User scheduler. #TODO is this right?
         slot_start: an int indicating the start point on the global time slot of the URLLC User.
@@ -83,13 +85,15 @@ class URLLC_User(Users):
         active: a boolean indicating the active status of the user.
     """
 
-    def __init__(self, uid, rb_size, rb_req, slot_len, slot_start, latency, error_rate):
+    def __init__(self, uid, rb_size, rb_req, slot_len, slot_start, retrans, latency, error_rate, mcs_error):
         Users.__init__(self, uid, rb_size, rb_req)
         self.slot_len = slot_len
         self.slot_start = slot_start
         self.latency = latency
-        self.errer_rate = error_rate
-        self.retrans = 0
+        self.delay = 0
+        self.error_rate = error_rate
+        self.mcs_error = mcs_error
+        self.retrans = retrans
 
     def current_status(self):
         if self.active:

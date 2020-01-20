@@ -17,8 +17,8 @@ class RB:
         self.bitmap = np.zeros(self.rb_num, dtype=np.int64)
         self.border_bitmap_id = embb_num
 
-    def find_all_nofree_rb(self):
-        """Find all continous region of rb units assigned to embb user.
+    def find_all_avi_rb(self, rb_num_req):
+        """Find all continous region of rb units.
 
         """
 
@@ -28,7 +28,7 @@ class RB:
         num_ass_list = []
         while(rb_start < len(self.bitmap)):
             rb_start = get_safe_true_start((self.bitmap[rb_valid_end:]<=self.border_bitmap_id) 
-                                            & (self.bitmap[rb_valid_end:]>0))
+                                            & (self.bitmap[rb_valid_end:]>=0))
             if rb_start is None:
                 return rb_start_list, rb_len_list
             else:
@@ -40,8 +40,9 @@ class RB:
                 rb_valid_end = rb_valid_end + rb_start 
             current = rb_valid_end - rb_start
             
-            rb_start_list.append(rb_start)
-            num_ass_list.append(current)
+            if current >= rb_num_req:
+                rb_start_list.append(rb_start)
+                num_ass_list.append(current)
 
         return rb_start_list, num_ass_list
 

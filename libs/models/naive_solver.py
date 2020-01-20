@@ -16,35 +16,39 @@ class NaiveSolver(Scheduler):
 
     def allocate_resource(self):
         self._user_sort()
-        rb_start = get_safe_true_start(self.RB_map.bitmap==0)
-        if rb_start is None:
-            print("ERROR: There is no free rb available")
-                break
-        rb_current = self.RB_map.rb_avi - rb_start
         for i in self.user_indexes:
             urllc_user = self.users[i]
             if urllc_user.active == 0:
                 print("ERROR: Inactive URLLC user is not clear!")
                 continue
-            if rb_current >= urllc_user.rb_num_req:
-                # assign to the free rb first
-                urllc_user.rb_num_ass = urllc_user.rb_num_req
-                urllc_user.sche_times += 1
-                urllc_user.rb_start = rb_start
-                rb_start += urllc_user.rb_num_ass
-                rb_current -= urllc_user.rb_num_req
-                self.RB_map.bitmap[rb_start:urllc_user.rb_num_req+rb_start] = int(urllc_user.user_info['id'])
-            else:
-                # get all the available rb region assigned to embb_user before
-                rb_start_list, num_ass_list = self.RB_map.find_all_nofree_rb()
-                if len(rb_start_list) == 0:
-                    print("ERROR: There is no free rb available")
-                    break
-                
-                # solver: modify status of urllc_user, embb_users and RB_map.bitmap
-                self._solver(rb_start_list, num_ass_list, i)
 
-    def _solver(self, rb_start_list, num_ass_list, idx):
+            # get all the available rb region assigned to embb_user before
+            rb_start_list, num_ass_list = self.RB_map.find_all_nofree_rb(urllc_user.rb_num_req)
+            if len(rb_start_list) == 0:
+                # wait for delay, return unscheduled urllc user list
+                print("There is no free rb available")
+                return self.users[i:]
+                
+            # solver
+            rb_start, rb_num_ass = self._solver(rb_start_list, num_ass_list, urllc_user)
+
+            # modify status of urllc_user, embb_users and RB_map.bitmap
+            urllc_user.rb_num_ass = rb_num_ass
+            urllc_user.sche_times += 1
+        return []   
+
+    def _solver(self, rb_start_list, num_ass_list, urllc_user):
+
+
+
+    def _user_sort(self):
+        """Sort based on .
+
+        """
+
+        pass
+
+
 
 
         
