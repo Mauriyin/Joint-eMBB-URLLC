@@ -16,7 +16,7 @@ class NaiveURLLCSolver(Scheduler):
 
     def allocate_resource(self):
         self._user_sort()
-
+        self.ass_users = []
         self.delay_users = []
         self.timeout_users = []
         for i in self.user_indexes:
@@ -46,9 +46,28 @@ class NaiveURLLCSolver(Scheduler):
             # solver
             rb_start, rb_num_ass = self._solver(rb_start_list, num_ass_list)
 
-            self._update(rb_start, rb_num_ass, urllc_user)
+            self.ass_users.append(self._update(rb_start, rb_num_ass, urllc_user))
 
-        return self.delay_users, self.timeout_users
+        for embb_user in self.embb_users:
+            # cal avg???? TODO
+            embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times - embb_user.replace_num / embb_user.slot_len) / embb_user.sche_times
+
+        return self.ass_users, self.delay_users, self.timeout_users
+    
+    def leave(self, urllc_user_list):
+        """Assigned URLLC user leave after the urllc time slot.
+           Recover bitmap and embb status.
+
+        """
+        for urllc_user in urllc_user_list:
+            rb_start = urllc_user.rb_start
+            rb_num_ass = urllc_user.rb_num_ass
+            assert len(urllc_user.ori_embb) > 0
+            for k in range(rb_num_ass):
+                id = urllc_user.ori_embb[k]
+                if id > 0 and id <= len(self.embb_users):
+                    self.embb_users[id-1].replace_num = max(0, self.embb_users[id-1].replace_num-1)
+                self.RB_map.bitmap[rb_start+k] = id
 
     def _solver(self, rb_start_list, num_ass_list):
         """Naive solver.
@@ -68,6 +87,7 @@ class NaiveURLLCSolver(Scheduler):
         """
         urllc_user.rb_start = rb_start
         urllc_user.rb_num_ass = rb_num_ass
+        urllc_user.ori_embb = []
         urllc_user.sche_times += 1
         for k in range(rb_num_ass):
             if self.RB_map.bitmap[rb_start+k] > 0:
@@ -75,9 +95,13 @@ class NaiveURLLCSolver(Scheduler):
                 if embb_user.active == 0 or int(embb_user.user_info['id']) != self.RB_map.bitmap[rb_start+k]:
                     print ("ERROR: embb user mismatched!")
                 else:
-                    embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times - 1) / embb_user.sche_times
+                    embb_user.replace_num += 1
+            urllc_user.ori_embb.append(self.RB_map.bitmap[rb_start+k])
             self.RB_map.bitmap[rb_start+k] = int(urllc_user.user_info['id'])
-    
+        assert len(urllc_user.ori_embb) == rb_num_ass
+
+        return urllc_user
+
     def _user_sort(self):
         """Sort based on ddl = latency-delay.
            Assign rb to users with less ddl.

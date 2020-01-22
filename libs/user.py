@@ -37,6 +37,7 @@ class eMBB_User(Users):
         DRC: a float indicating the maximum data rate.
         rate_slot: a float indicating the local average data rate in the current time slot.  #TODO is this right?
         rate_avg: a float indicating the average data rate on the global time slot.
+        replace_num: an int indicating the rb unit num replaced by URLLC users.
         slot_len: an int indicating the scheduler time slot length for an eMBB User, 
                   the functioning frequency of eMBB User scheduler. #TODO is this right?
         user_info: a dict with keys of id (an int) and other info.
@@ -54,6 +55,7 @@ class eMBB_User(Users):
         self.DRC = (self.rb_size * self.rb_num_req / 1000) / slot_len
         self.rate_slot = 0.0
         self.rate_avg = 0.0
+        self.replace_num = 0
     
     def current_status(self): 
         if self.active:
@@ -71,6 +73,8 @@ class URLLC_User(Users):
         latency: an int indicating the lantency maximum constriant of the URLLC User.
         delay: an int indicating the actual delay time of the URLLC User.
         miss: an int indicating the actual missed times of the URLLC User.
+        ori_embb: an int list indicating the id of the embb user been replaced by the URLLC user, len of the 
+                  list equals to the assigned rb number, id 0 for free rb originally.
         error_rate: a float indicating the maximum error rate constriant of the URLLC User.
         mcs_error: a float indicating error rate for each transmission. 
         slot_len: an int indicating the scheduler time slot length for an URLLC User, 
@@ -93,6 +97,7 @@ class URLLC_User(Users):
         self.latency = latency
         self.delay = 0
         self.miss = 0
+        self.ori_embb = []
         self.error_rate = error_rate
         self.mcs_error = mcs_error
         self.retrans = retrans
