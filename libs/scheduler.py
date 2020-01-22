@@ -10,11 +10,7 @@ class Scheduler():
     
     def allocate_resource(self):
         self._user_sort()
-        self._solver()
         raise NotImplementedError
-
-    def _solver(self):
-        pass
 
     def _user_sort(self):
         user_indexes = list(range(0, len(self.users)))
@@ -61,15 +57,11 @@ class PfScheduler(Scheduler):
                 embb_user.rb_start = rb_start
                 self.RB_map.bitmap[rb_start:rb_current+rb_start] = int(embb_user.user_info['id'])
                 break
-
-    def _solver(self, rb_start, rb_num_ass, idx):
-        # solver: modify status of urllc_user, embb_users and RB_map.bitmap 可以写进来
-        pass
         
     def _user_sort(self):
         self.pf_weight = []
         for i in self.users:
             weighti = i.DRC / (0.01 * i.DRC + 0.99 * i.rate_avg)
             self.pf_weight.append(weighti)
-        self.user_indexes = [index for index, value in sorted(list(enumerate(pf_weight)),key=lambda x:x[1],reverse = True)]
+        self.user_indexes = [index for index, value in sorted(list(enumerate(self.pf_weight)),key=lambda x:x[1],reverse = True)]
         

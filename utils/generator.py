@@ -5,8 +5,7 @@ from libs.user import URLLC_User
 from libs.rb import RB
 from utils.utils import get_retrans_schedule
 
-def generate(
-             rb_size,
+def generate(rb_size,
              rb_num,
              embb_num, 
              embb_slot_len, 
