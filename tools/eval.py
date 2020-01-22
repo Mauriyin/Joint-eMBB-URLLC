@@ -63,7 +63,7 @@ while(global_time <= max_sim_time_slot_len):
     global_timeout_urllc_users.append(timeout_users)
 
     # urllc leave
-    urllc_scheduler._leave(ass_users)
+    urllc_scheduler.leave(ass_users)
     
 # get_embb_utility miss_list and time cost for all the urllc scheduler
 embb_utility = get_embb_utility(embb_users)

@@ -35,7 +35,6 @@ embb_users, urllc_users, RB_map = generate(rb_size,
 
 global_time = 0
 global_timeout_urllc_users = []
-delay_users = []
 
 # embb_time_slot pfs scheduler
 pf_scheduler = PfScheduler(RB_map, embb_users)
@@ -58,10 +57,13 @@ while(global_time <= max_sim_time_slot_len):
     urllc_scheduler = URLLCSolver(RB_map, embb_users, urllc_users_list)
 
     start = time.time()
-    delay_users, timeout_users = urllc_scheduler.allocate_resource()
+    ass_users, delay_users, timeout_users = urllc_scheduler.allocate_resource()
     timer.append(time.time() - start)
 
     global_timeout_urllc_users.append(timeout_users)
+
+    # urllc leave
+    urllc_scheduler.leave(ass_users)
     
 # get_embb_utility miss_list and time cost for all the urllc scheduler
 embb_utility = get_embb_utility(embb_users)
