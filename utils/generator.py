@@ -49,7 +49,7 @@ def generate(rb_size,
     id_current = 1
     slot_len = max(embb_slot_len, urllc_slot_len)
     # generate embb, id in sequence, rb_num_req in random
-    embb_upper = int(rb_avi / 5)
+    embb_upper = int(rb_avi / 5) + 1
     assert embb_upper >=0
     for i in range(embb_num):
         rb_num_req = random.randint(0, embb_upper)

@@ -70,6 +70,7 @@ class URLLC_User(Users):
     Attributes:
         latency: an int indicating the lantency maximum constriant of the URLLC User.
         delay: an int indicating the actual delay time of the URLLC User.
+        miss: an int indicating the actual missed times of the URLLC User.
         error_rate: a float indicating the maximum error rate constriant of the URLLC User.
         mcs_error: a float indicating error rate for each transmission. 
         slot_len: an int indicating the scheduler time slot length for an URLLC User, 
@@ -91,6 +92,7 @@ class URLLC_User(Users):
         self.slot_start = slot_start
         self.latency = latency
         self.delay = 0
+        self.miss = 0
         self.error_rate = error_rate
         self.mcs_error = mcs_error
         self.retrans = retrans

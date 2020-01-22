@@ -22,8 +22,12 @@ class NaiveURLLCSolver(Scheduler):
         for i in self.user_indexes:
             urllc_user = self.users[i]
             if self.ddl_list[i] < 0:
-                print("URLLC user %d is time out" %(urllc_user.user_info['id']))
-                self.timeout_users.append(urllc_user)
+                urllc_user.miss += 1
+                if urllc_user.miss == urllc_user.retrans + 1:
+                    print("URLLC user %d is time out" %(urllc_user.user_info['id']))
+                    self.timeout_users.append(urllc_user)
+                elif urllc_user.miss > urllc_user.retrans + 1:
+                    print("URLLC user %d error trans" %(urllc_user.user_info['id']))
                 continue
             if urllc_user.active == 0:
                 print("ERROR: Inactive URLLC user is not clear!")
@@ -68,8 +72,8 @@ class NaiveURLLCSolver(Scheduler):
         for k in range(rb_num_ass):
             if self.RB_map.bitmap[rb_start+k] > 0:
                 embb_user = self.embb_users[self.RB_map.bitmap[rb_start+k]-1]
-                if embb_user.active == 0:
-                    print ("ERROR: Inactive embb user is not clear!")
+                if embb_user.active == 0 or int(embb_user.user_info['id']) != self.RB_map.bitmap[rb_start+k]:
+                    print ("ERROR: embb user mismatched!")
                 else:
                     embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times - 1) / embb_user.sche_times
             self.RB_map.bitmap[rb_start+k] = int(urllc_user.user_info['id'])

@@ -27,8 +27,8 @@ class GreedyURLLCSolver(NaiveURLLCSolver):
             for k in range(rb_num_ass):
                 if self.RB_map.bitmap[rb_start+k] > 0:
                     embb_user = embb_user_list[self.RB_map.bitmap[rb_start+k]-1]
-                    if embb_user.active == 0:
-                        print ("ERROR: Inactive embb user is not clear!")
+                    if embb_user.active == 0 or int(embb_user.user_info['id']) != self.RB_map.bitmap[rb_start+k]:
+                        print ("ERROR: embb user mismatched!")
                     else:
                         embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times - 1) / embb_user.sche_times
 
