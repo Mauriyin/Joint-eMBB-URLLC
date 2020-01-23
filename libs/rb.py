@@ -14,7 +14,7 @@ class RB:
     def __init__(self, rb_num, rb_size, embb_num):
         self.rb_avi = rb_num
         self.rb_size = rb_size
-        self.bitmap = np.zeros(self.rb_num, dtype=np.int64)
+        self.bitmap = np.zeros(self.rb_avi, dtype=np.int64)
         self.border_bitmap_id = embb_num
 
     def find_all_avi_rb(self, rb_num_req):
@@ -30,7 +30,7 @@ class RB:
             rb_start = get_safe_true_start((self.bitmap[rb_valid_end:]<=self.border_bitmap_id) 
                                             & (self.bitmap[rb_valid_end:]>=0))
             if rb_start is None:
-                return rb_start_list, rb_len_list
+                return rb_start_list, num_ass_list
             else:
                 rb_start = rb_start + rb_valid_end
             rb_valid_end = get_safe_true_start(self.bitmap[rb_start:] > self.border_bitmap_id)

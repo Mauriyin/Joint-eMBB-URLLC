@@ -34,7 +34,7 @@ class NaiveURLLCSolver(Scheduler):
                 continue
             
             # get all the available rb region assigned to embb_user before
-            rb_start_list, num_ass_list = self.RB_map.find_all_nofree_rb(urllc_user.rb_num_req)
+            rb_start_list, num_ass_list = self.RB_map.find_all_avi_rb(urllc_user.rb_num_req)
 
             if len(rb_start_list) == 0:
                 # wait for delay, return unscheduled urllc user list
@@ -50,8 +50,9 @@ class NaiveURLLCSolver(Scheduler):
 
         for embb_user in self.embb_users:
             # cal avg???? TODO
-            embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times - embb_user.replace_num / embb_user.slot_len) / embb_user.sche_times
-
+            if embb_user.sche_times:
+                embb_user.rate_avg = (embb_user.rate_avg * (embb_user.rb_num_ass - embb_user.replace_num)) / embb_user.rb_num_ass
+                
         return self.ass_users, self.delay_users, self.timeout_users
     
     def leave(self, urllc_user_list):
@@ -85,6 +86,7 @@ class NaiveURLLCSolver(Scheduler):
            modify rate_avg of embb_users and RB_map.bitmap.
 
         """
+        rb_num_ass = min(rb_num_ass, urllc_user.rb_num_req)
         urllc_user.rb_start = rb_start
         urllc_user.rb_num_ass = rb_num_ass
         urllc_user.ori_embb = []

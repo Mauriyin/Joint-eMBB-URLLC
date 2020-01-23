@@ -10,12 +10,19 @@ from utils.metrics import get_embb_utility
 # from utils.visualization import draw_matrix
 
 # parameter setting
-rb_num = 5
-embb_num = 5
+rb_size = 15
+rb_num = 254
+embb_num = 3
 embb_slot_len = 7
-urllc_num = 7
+urllc_num = 6
 urllc_slot_len = 1
-max_sim_time_slot_len = 20
+max_sim_time_slot_len = embb_slot_len
+
+embb_rb_req = [100, 50, 120]
+embb_rb_size = [60, 120, 30]
+urllc_rb_req = [10, 10, 10, 10, 10, 10]
+urllc_rb_size = [30, 30, 30, 30, 30, 30]
+urllc_slot_start = [1, 2, 3, 4, 5, 6]
 
 #urllc scheduler setting
 URLLCSolver = NaiveURLLCSolver
@@ -28,6 +35,11 @@ embb_users, urllc_users, RB_map = generate(rb_size,
     embb_slot_len, 
     urllc_num,
     urllc_slot_len,
+    embb_rb_req,
+    embb_rb_size,
+    urllc_rb_req,
+    urllc_rb_size,
+    urllc_slot_start,
     latency=1,
     error_rate=1e-5,
     mcs_error=1e-3,
@@ -44,16 +56,16 @@ pf_scheduler.allocate_resource()
 urllc_users.sort(key=lambda x:x.slot_start)
 urllc_come_time = np.array([u.slot_start for u in urllc_users])
 
+delay_users = []
 timer = []
 # urllc scheduler loop for all the urllc_time_slot without considering embb user rescheduling
-while(global_time <= max_sim_time_slot_len):
+while(global_time < max_sim_time_slot_len):
     global_time += 1
-    current_slot_time = global_time % embb_slot_len
-    indexes = np.where(urllc_come_time==current_slot_time)[0]
+    indexes = np.where(urllc_come_time==global_time)[0]
     if len(indexes) == 0:
         continue
     urllc_users_list = delay_users + urllc_users.copy()[indexes[0]:indexes[-1]+1]
-    
+
     urllc_scheduler = URLLCSolver(RB_map, embb_users, urllc_users_list)
 
     start = time.time()
@@ -67,7 +79,6 @@ while(global_time <= max_sim_time_slot_len):
     
 # get_embb_utility miss_list and time cost for all the urllc scheduler
 embb_utility = get_embb_utility(embb_users)
-global_timeout_urllc_users = set(global_timeout_urllc_users)
 total_time_cost = sum(timer)
 
 # visualize (TODO)

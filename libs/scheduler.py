@@ -6,7 +6,6 @@ class Scheduler():
     def __init__(self, RB_map, users):
         self.RB_map = RB_map
         self.users = users
-        self._allocate_resource()
     
     def allocate_resource(self):
         self._user_sort()
@@ -28,7 +27,7 @@ class PfScheduler(Scheduler):
     """
 
     def __init__(self, RB_map, users):
-        Scheduler.__init__(self, RB_map, user)
+        Scheduler.__init__(self, RB_map, users)
         self.pf_weight = []
         self.user_indexes = []
     
@@ -46,9 +45,9 @@ class PfScheduler(Scheduler):
                 embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times + embb_user.DRC) / (embb_user.sche_times + 1)
                 embb_user.sche_times += 1
                 embb_user.rb_start = rb_start
+                self.RB_map.bitmap[rb_start:embb_user.rb_num_req+rb_start] = int(embb_user.user_info['id'])
                 rb_start += embb_user.rb_num_ass
                 rb_current -= embb_user.rb_num_req
-                self.RB_map.bitmap[rb_start:embb_user.rb_num_req+rb_start] = int(embb_user.user_info['id'])
             else:
                 embb_user.rb_num_ass = rb_current
                 new_DRC = (rb_current * embb_user.rb_size / 1000) / embb_user.slot_len
@@ -60,8 +59,15 @@ class PfScheduler(Scheduler):
         
     def _user_sort(self):
         self.pf_weight = []
+        pf_weight = []
+        zero_flag = True
         for i in self.users:
             weighti = i.DRC / (0.01 * i.DRC + 0.99 * i.rate_avg)
+            if i.rate_avg > 0:
+                zero_flag = False
             self.pf_weight.append(weighti)
-        self.user_indexes = [index for index, value in sorted(list(enumerate(self.pf_weight)),key=lambda x:x[1],reverse = True)]
+            pf_weight.append(weighti * i.DRC)
+        if zero_flag is False:
+            pf_weight = self.pf_weight
+        self.user_indexes = [index for index, value in sorted(list(enumerate(pf_weight)),key=lambda x:x[1],reverse = True)]
         

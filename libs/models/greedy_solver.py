@@ -1,5 +1,5 @@
 from libs.models.naive_solver import NaiveURLLCSolver
-from from utils.metrics import get_embb_utility
+from utils.metrics import get_embb_utility
 
 class GreedyURLLCSolver(NaiveURLLCSolver):
     """Scheduler for URLLC users with greedy algorithm.
