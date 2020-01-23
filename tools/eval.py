@@ -82,6 +82,10 @@ embb_utility = get_embb_utility(embb_users)
 total_time_cost = sum(timer)
 
 # visualize (TODO)
+for user in embb_users:
+    print(user .__dict__.items())
+print("\n")
+print(RB_map.__dict__.items())
 
 # next embb_time_slot (not show here)
 
