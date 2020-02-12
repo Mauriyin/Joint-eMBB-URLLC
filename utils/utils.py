@@ -4,7 +4,7 @@ def get_safe_true_start(bool_array):
     return bool_array.argmax()
 
 def get_retrans_schedule(latency, error_rate, mcs_error):
-    retrans = 1
+    retrans = 0
     retrans_start = []
     for i in range(retrans):
         retrans_start.append(8)
