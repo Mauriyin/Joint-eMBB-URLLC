@@ -43,6 +43,7 @@ class PfScheduler(Scheduler):
             if rb_current >= embb_user.rb_num_req:
                 embb_user.rb_num_ass = embb_user.rb_num_req
                 embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times + embb_user.DRC) / (embb_user.sche_times + 1)
+                embb_user.rate_cur = embb_user.DRC
                 embb_user.sche_times += 1
                 embb_user.rb_start = rb_start
                 self.RB_map.bitmap[rb_start:embb_user.rb_num_req+rb_start] = int(embb_user.user_info['id'])
@@ -52,6 +53,7 @@ class PfScheduler(Scheduler):
                 embb_user.rb_num_ass = rb_current
                 new_DRC = (rb_current * embb_user.rb_size / 1000) / embb_user.slot_len
                 embb_user.rate_avg = (embb_user.rate_avg * embb_user.sche_times + new_DRC) / (embb_user.sche_times + 1)
+                embb_user.rate_cur = new_DRC
                 embb_user.sche_times += 1
                 embb_user.rb_start = rb_start
                 self.RB_map.bitmap[rb_start:rb_current+rb_start] = int(embb_user.user_info['id'])

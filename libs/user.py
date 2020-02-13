@@ -55,6 +55,7 @@ class eMBB_User(Users):
         self.DRC = (self.rb_size * self.rb_num_req / 1000) / slot_len
         self.rate_slot = 0.0
         self.rate_avg = 0.0
+        self.rate_cur = 0.0
         self.replace_num = 0
     
     def current_status(self): 

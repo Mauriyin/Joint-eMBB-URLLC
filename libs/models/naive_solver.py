@@ -51,8 +51,9 @@ class NaiveURLLCSolver(Scheduler):
         for embb_user in self.embb_users:
             # cal avg???? TODO
             if embb_user.sche_times:
-                embb_user.rate_avg = (embb_user.rate_avg * (embb_user.rb_num_ass - embb_user.replace_num)) / embb_user.rb_num_ass
-                
+                embb_user.rate_avg -= embb_user.rate_cur
+                embb_user.rate_cur = (embb_user.rate_cur * ((embb_user.rb_num_ass)*7 - embb_user.replace_num)) / ((embb_user.rb_num_ass)*7)
+                embb_user.rate_avg = (embb_user.rate_avg * (embb_user.sche_times - 1) + embb_user.rate_cur) / (embb_user.sche_times)
         return self.ass_users, self.delay_users, self.timeout_users
     
     def leave(self, urllc_user_list):
