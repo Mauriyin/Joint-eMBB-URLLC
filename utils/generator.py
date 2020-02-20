@@ -88,8 +88,34 @@ def generate(rb_size,
 
     RB_map = RB(rb_num, rb_size, embb_num)
 
-    return embb_users, urllc_users, RB_map
+    return embb_users, urllc_users, RB_map, id_total
 
 
+def generate_urllc(
+             urllc_num,
+             urllc_slot_len,
+             urllc_rb_req,
+             urllc_rb_size,
+             urllc_slot_start,
+             latency=1,
+             error_rate=1e-5,
+             mcs_error=1e-5,
+             id_current,
+             ):
+    urllc_users = []
+    for i in range(urllc_num):
+        rb_num_req = urllc_rb_req[i]
+        slot_start = urllc_slot_start[i]
+        rb_size = urllc_rb_size[i]
+        retrans, trans_start = get_retrans_schedule(latency, error_rate, mcs_error)
+        assert retrans == len(trans_start)
+        trans_start.insert(0, 0)
+        for j in range(retrans+1):
+            t = trans_start[j]
+            urllc_user = URLLC_User(id_current+i+j, rb_size, rb_num_req, urllc_slot_len,
+                slot_start+t, retrans, latency, error_rate, mcs_error)
+            urllc_user.active = 1
+            urllc_users.append(urllc_user)
+        id_current = id_current + retrans
 
-
+    return urllc_users, id_total
