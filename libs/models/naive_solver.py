@@ -35,23 +35,25 @@ class NaiveURLLCSolver(Scheduler):
             
             # get all the available rb region assigned to embb_user before
             rb_start_list, num_ass_list = self.RB_map.find_all_avi_rb(urllc_user.rb_num_req)
-
+            #print(rb_start_list)
+            #print(num_ass_list)
             if len(rb_start_list) == 0:
                 # wait for delay, return unscheduled urllc user list
                 print("There is no free rb available for URLLC user %d" %(urllc_user.user_info['id']))
                 urllc_user.delay += 1
                 self.delay_users.append(urllc_user)
                 continue
-                
+            num_req = urllc_user.rb_num_req    
             # solver
-            rb_start, rb_num_ass = self._solver(rb_start_list, num_ass_list)
+            rb_start, rb_num_ass = self._solver(rb_start_list, num_ass_list, num_req)
 
             self.ass_users.append(self._update(rb_start, rb_num_ass, urllc_user))
 
         for embb_user in self.embb_users:
             # cal avg???? TODO
             if embb_user.sche_times:
-                embb_user.rate_avg -= embb_user.rate_cur
+                if embb_user.sche_times > 1:
+                    embb_user.rate_avg = (embb_user.rate_avg*(embb_user.sche_times) - embb_user.rate_cur) / (embb_user.sche_times - 1)
                 embb_user.rate_cur = (embb_user.rate_cur * ((embb_user.rb_num_ass)*7 - embb_user.replace_num)) / ((embb_user.rb_num_ass)*7)
                 embb_user.rate_avg = (embb_user.rate_avg * (embb_user.sche_times - 1) + embb_user.rate_cur) / (embb_user.sche_times)
         return self.ass_users, self.delay_users, self.timeout_users
@@ -71,7 +73,7 @@ class NaiveURLLCSolver(Scheduler):
                     self.embb_users[id-1].replace_num = max(0, self.embb_users[id-1].replace_num-1)
                 self.RB_map.bitmap[rb_start+k] = id
 
-    def _solver(self, rb_start_list, num_ass_list):
+    def _solver(self, rb_start_list, num_ass_list, num_req):
         """Naive solver.
            Assign the last suitable and available rb region.
            Return the rb_bitmap start point and corresponding assigned rb unit number.

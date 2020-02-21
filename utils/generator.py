@@ -88,20 +88,20 @@ def generate(rb_size,
 
     RB_map = RB(rb_num, rb_size, embb_num)
 
-    return embb_users, urllc_users, RB_map, id_total
+    return embb_users, urllc_users, RB_map, id_current
 
 
-def generate_urllc(
-             urllc_num,
-             urllc_slot_len,
-             urllc_rb_req,
-             urllc_rb_size,
-             urllc_slot_start,
-             latency=1,
-             error_rate=1e-5,
-             mcs_error=1e-5,
-             id_current,
-             ):
+def urllc_generate(urllc_num, 
+                   urllc_slot_len,
+                   urllc_rb_req,
+                   urllc_rb_size,
+                   urllc_slot_start,
+                   id_current,
+                   latency=1,
+                   error_rate=1e-5,
+                   mcs_error=1e-5,
+                   ):
+    random.seed()
     urllc_users = []
     for i in range(urllc_num):
         rb_num_req = urllc_rb_req[i]
@@ -118,4 +118,4 @@ def generate_urllc(
             urllc_users.append(urllc_user)
         id_current = id_current + retrans
 
-    return urllc_users, id_total
+    return urllc_users, id_current
