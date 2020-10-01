@@ -1,3 +1,3 @@
 # Joint-eMBB-URLLC
 
-Simulation code for joint scheduling problems of URLLC and eMBB in 5G NR
+Scheduling algorithms and simulation for joint traffic with mini-slot in 5G NR.
