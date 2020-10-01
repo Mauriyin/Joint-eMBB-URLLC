@@ -5,21 +5,23 @@ from libs.user import URLLC_User
 from libs.rb import RB
 from utils.utils import get_retrans_schedule
 
-def generate(rb_size,
-             rb_num,
-             embb_num, 
-             embb_slot_len, 
-             urllc_num,
-             urllc_slot_len,
-             embb_rb_req,
-             embb_rb_size,
-             urllc_rb_req,
-             urllc_rb_size,
-             urllc_slot_start,
-             latency=1,
-             error_rate=1e-5,
-             mcs_error=1e-3,
-             ):
+
+def generate(
+    rb_size,
+    rb_num,
+    embb_num,
+    embb_slot_len,
+    urllc_num,
+    urllc_slot_len,
+    embb_rb_req,
+    embb_rb_size,
+    urllc_rb_req,
+    urllc_rb_size,
+    urllc_slot_start,
+    latency=1,
+    error_rate=1e-5,
+    mcs_error=1e-3,
+):
     """Generate the simulation input of eMBB Users and URLLC Users, 
        as well as initializing RB status.
 
@@ -29,13 +31,13 @@ def generate(rb_size,
 
     Args:
         rb_size: an int indicating the size of one rb unit.
-        rb_num: an int indicating the total number of rb units. #TODO is this right?
+        rb_num: an int indicating the total number of rb units. 
         embb_num: an int indicating the total number of coming eMBB Users.
         embb_slot_len: an int indicating the scheduler time slot length for an eMBB User, 
-            the functioning frequency of eMBB User scheduler. #TODO is this right?
+            the functioning frequency of eMBB User scheduler. 
         urllc_num: an int indicating the total number of coming URLLC Users.
         urllc_slot_len: an int indicating the scheduler time slot length for an URLLC User, 
-            the functioning frequency of URLLC User scheduler. #TODO is this right?
+            the functioning frequency of URLLC User scheduler. 
         embb_rb_req: an int list indicating the req number of rb from each eMBB User.
         embb_rb_size: an int list indicating the rb unit size from each eMBB User.
         urllc_rb_req: an int list indicating  the req number of rb from each URLLCUser.
@@ -53,7 +55,7 @@ def generate(rb_size,
     """
 
     random.seed()
-    
+
     embb_users = []
     urllc_users = []
     id_current = 1
@@ -63,25 +65,29 @@ def generate(rb_size,
     for i in range(embb_num):
         rb_num_req = embb_rb_req[i]
         rb_size = embb_rb_size[i]
-        embb_user = eMBB_User(id_current+i, rb_size, rb_num_req, embb_slot_len)
-        embb_user.active = 1 # active at the beginning, time slot 0
+        embb_user = eMBB_User(id_current + i, rb_size, rb_num_req,
+                              embb_slot_len)
+        embb_user.active = 1  # active at the beginning, time slot 0
         embb_users.append(embb_user)
 
     id_current = embb_num + 1
 
     # generate urllc, id in sequence, rb_num_req & slot_start in random
-    assert len(urllc_rb_req) == urllc_num == len(urllc_rb_size) == len(urllc_slot_start)
+    assert len(urllc_rb_req) == urllc_num == len(urllc_rb_size) == len(
+        urllc_slot_start)
     for i in range(urllc_num):
         rb_num_req = urllc_rb_req[i]
         slot_start = urllc_slot_start[i]
         rb_size = urllc_rb_size[i]
-        retrans, trans_start = get_retrans_schedule(latency, error_rate, mcs_error)
+        retrans, trans_start = get_retrans_schedule(latency, error_rate,
+                                                    mcs_error)
         assert retrans == len(trans_start)
         trans_start.insert(0, 0)
-        for j in range(retrans+1):
+        for j in range(retrans + 1):
             t = trans_start[j]
-            urllc_user = URLLC_User(id_current+i+j, rb_size, rb_num_req, urllc_slot_len,
-                slot_start+t, retrans, latency, error_rate, mcs_error)
+            urllc_user = URLLC_User(id_current + i + j, rb_size, rb_num_req,
+                                    urllc_slot_len, slot_start + t, retrans,
+                                    latency, error_rate, mcs_error)
             urllc_user.active = 1
             urllc_users.append(urllc_user)
         id_current = id_current + retrans
@@ -91,29 +97,32 @@ def generate(rb_size,
     return embb_users, urllc_users, RB_map, id_current
 
 
-def urllc_generate(urllc_num, 
-                   urllc_slot_len,
-                   urllc_rb_req,
-                   urllc_rb_size,
-                   urllc_slot_start,
-                   id_current,
-                   latency=1,
-                   error_rate=1e-5,
-                   mcs_error=1e-5,
-                   ):
+def urllc_generate(
+    urllc_num,
+    urllc_slot_len,
+    urllc_rb_req,
+    urllc_rb_size,
+    urllc_slot_start,
+    id_current,
+    latency=1,
+    error_rate=1e-5,
+    mcs_error=1e-5,
+):
     random.seed()
     urllc_users = []
     for i in range(urllc_num):
         rb_num_req = urllc_rb_req[i]
         slot_start = urllc_slot_start[i]
         rb_size = urllc_rb_size[i]
-        retrans, trans_start = get_retrans_schedule(latency, error_rate, mcs_error)
+        retrans, trans_start = get_retrans_schedule(latency, error_rate,
+                                                    mcs_error)
         assert retrans == len(trans_start)
         trans_start.insert(0, 0)
-        for j in range(retrans+1):
+        for j in range(retrans + 1):
             t = trans_start[j]
-            urllc_user = URLLC_User(id_current+i+j, rb_size, rb_num_req, urllc_slot_len,
-                slot_start+t, retrans, latency, error_rate, mcs_error)
+            urllc_user = URLLC_User(id_current + i + j, rb_size, rb_num_req,
+                                    urllc_slot_len, slot_start + t, retrans,
+                                    latency, error_rate, mcs_error)
             urllc_user.active = 1
             urllc_users.append(urllc_user)
         id_current = id_current + retrans

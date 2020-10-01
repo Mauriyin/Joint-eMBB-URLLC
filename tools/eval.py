@@ -29,10 +29,11 @@ URLLCSolver = NaiveURLLCSolver
 # URLLCSolver = GreedyURLLCSolver
 
 # generate
-embb_users, urllc_users, RB_map = generate(rb_size,
+embb_users, urllc_users, RB_map = generate(
+    rb_size,
     rb_num,
-    embb_num, 
-    embb_slot_len, 
+    embb_num,
+    embb_slot_len,
     urllc_num,
     urllc_slot_len,
     embb_rb_req,
@@ -52,19 +53,19 @@ global_timeout_urllc_users = []
 pf_scheduler = PfScheduler(RB_map, embb_users)
 pf_scheduler.allocate_resource()
 
-# urllc_time_slot get urllc_active_come_list, setting urllc come from global_time=1 and later
-urllc_users.sort(key=lambda x:x.slot_start)
+urllc_users.sort(key=lambda x: x.slot_start)
 urllc_come_time = np.array([u.slot_start for u in urllc_users])
 
 delay_users = []
 timer = []
-# urllc scheduler loop for all the urllc_time_slot without considering embb user rescheduling
-while(global_time < max_sim_time_slot_len):
+
+while (global_time < max_sim_time_slot_len):
     global_time += 1
-    indexes = np.where(urllc_come_time==global_time)[0]
+    indexes = np.where(urllc_come_time == global_time)[0]
     if len(indexes) == 0:
         continue
-    urllc_users_list = delay_users + urllc_users.copy()[indexes[0]:indexes[-1]+1]
+    urllc_users_list = delay_users + urllc_users.copy(
+    )[indexes[0]:indexes[-1] + 1]
 
     urllc_scheduler = URLLCSolver(RB_map, embb_users, urllc_users_list)
 
@@ -76,18 +77,15 @@ while(global_time < max_sim_time_slot_len):
 
     # urllc leave
     urllc_scheduler.leave(ass_users)
-    
+
 # get_embb_utility miss_list and time cost for all the urllc scheduler
 embb_utility = get_embb_utility(embb_users)
 total_time_cost = sum(timer)
 
 # visualize (TODO)
 for user in embb_users:
-    print(user .__dict__.items())
+    print(user.__dict__.items())
 print("\n")
 print(RB_map.__dict__.items())
 
 # next embb_time_slot (not show here)
-
-
-
